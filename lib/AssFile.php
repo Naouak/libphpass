@@ -1,12 +1,6 @@
 <?php
 namespace LibPHPAss;
-/**
- * Created by JetBrains PhpStorm.
- * User: Naouak
- * Date: 06/12/12
- * Time: 01:21
- * To change this template use File | Settings | File Templates.
- */ 
+
 class AssFile {
     private $type = null;
 
@@ -34,8 +28,15 @@ class AssFile {
      * @param $content string Content of the ass file.
      */
     private function __construct($content){
+        //File may contains a BOM so we need to detect it and remove it if necessary
+        $bom = pack("CCC", 0xef, 0xbb, 0xbf);
+        if (0 == strncmp($content, $bom, 3)) {
+            $content = substr($content, 3);
+        }
+
+
         //Remove any windows line returns
-        $content = strstr("\r\n",$content);
+        $content = str_replace("\r\n","\n",$content);
         //Explode line by line as an ass file can be parsed line by line
         $lines = explode("\n",$content);
 
@@ -58,7 +59,7 @@ class AssFile {
         //Styles (and ass or ssa determination)
         if(strtolower(trim($lines[$i])) == "[v4 styles]"){
             $this->type = "ssa";
-        } else if(strtolower(trim($lines[$i])) == "[v4 styles+]"){
+        } else if(strtolower(trim($lines[$i])) == "[v4 styles+]" || strtolower(trim($lines[$i])) == "[v4+ styles]"){
             $this->type = "ass";
         } else {
             throw new \Exception("Invalid File Type");
@@ -77,7 +78,7 @@ class AssFile {
         $i++;
 
         //While in Events
-        while($i < sizeof($lines) && $lines[$i][0] != "["){
+        while($i < sizeof($lines) && strlen($lines[$i]) > 0 && $lines[$i][0] != "["){
             $i++;
         }
 
