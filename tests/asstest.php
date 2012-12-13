@@ -38,7 +38,7 @@ class AssTest extends PHPUnit_Framework_TestCase {
         }
 
         foreach ($expectedheader as $expectedKey => $expectedValue) {
-            $this->assertNotEmpty($header[$expectedKey]);
+            $this->assertTrue(isset($header[$expectedKey]));
             $this->assertEquals($expectedValue,$header[$expectedKey]);
         }
 
