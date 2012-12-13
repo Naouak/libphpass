@@ -13,13 +13,13 @@ class AssFile {
         "Synch Point",
         "Script Updated By",
         "Update Details",
-        "Script Type",
+        "ScriptType",
         "Collisions",
         "PlayResX",
         "PlayResY",
         "PlayDepth",
         "Timer",
-        "Wrap Style"
+        "WrapStyle"
     );
 
     private $head = array();
@@ -121,13 +121,13 @@ class AssFile {
         }
 
         //Let's manage parameters that have only a set of predefined values
-        if($param == "Script Type" && ($value != "V4.00" && $value != "V4.00+")){
+        if($param == "ScriptType" && (strtolower($value) != "v4.00" && strtolower($value) != "v4.00+")){
             return false;
         } else if ($param == "Collisions" && ($value != "Normal" && $value != "Reverse")) {
             return false;
         } else if (($param == "PlayResX" || $param == "PlayResY" || $param == "PlayDepth" || $param == "Timer") && (!is_numeric($value))) {
             return false;
-        } else if ($param == "Wrap Style" && (!is_numeric($value) || $value < 0 || $value > 3)) {
+        } else if ($param == "WrapStyle" && (!is_numeric($value) || $value < 0 || $value > 3)) {
             return false;
         }
 
@@ -143,9 +143,21 @@ class AssFile {
         foreach ($header as $line) {
             $data = explode(":",$line,2);
             if(sizeof($data) == 2){
-                $this->setHeaderInformation($data[0],$data[1]);
+                $this->setHeaderInformation(trim($data[0]),trim($data[1]));
             }
         }
 
+    }
+
+    public function getHeaderInfo($info = null){
+        if($info == null){
+            return $this->head;
+        }
+        else if(isset($this->head[$info])){
+            return $this->head[$info];
+        }
+        else{
+            return null;
+        }
     }
 }
