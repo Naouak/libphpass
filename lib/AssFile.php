@@ -21,8 +21,37 @@ class AssFile {
         "Timer",
         "WrapStyle"
     );
+    static private $stylesParamsAccepted = array(
+        "Name",
+        "Fontname",
+        "Fontsize",
+        "PrimaryColour",
+        "SecondaryColour",
+        "TertiaryColour",
+        "OutlineColor",
+        "BackColour",
+        "Bold",
+        "Italic",
+        "Underline",
+        "StrikeOut",
+        "ScaleX",
+        "ScaleY",
+        "Spacing",
+        "Angle",
+        "BorderStyle",
+        "Outline",
+        "Shadow",
+        "Alignment",
+        "MarginL",
+        "MarginR",
+        "MarginV",
+        "AlphaLevel",
+        "Encoding"
+    );
 
     private $head = array();
+    private $styleFieldsOrder = null;
+    private $styles = array();
 
     /**
      * @param $content string Content of the ass file.
@@ -66,10 +95,14 @@ class AssFile {
         }
         $i++;
 
+        $j = $i;
         //While in Style
         while($i < sizeof($lines) && $lines[$i][0] != "["){
             $i++;
         }
+
+        $styles = array_slice($lines,$j,$i-$j);
+        $this->parseStyles($styles);
 
         //Events
         if(strtolower(trim($lines[$i])) != "[events]"){
@@ -149,6 +182,10 @@ class AssFile {
 
     }
 
+    /**
+     * @param null $info Particular field to fetch. If null every fields are returned.
+     * @return array|null
+     */
     public function getHeaderInfo($info = null){
         if($info == null){
             return $this->head;
@@ -159,5 +196,152 @@ class AssFile {
         else{
             return null;
         }
+    }
+
+    private function parseStyles($styles)
+    {
+        $formatDefined = false;
+        foreach ($styles as $style) {
+            $value = explode(":",$style);
+            //If the line is not recognized we just skip it.
+            if(
+                sizeof($value) != 2 ||
+                ($value[0] != "Format" && $value[0] != "Style")
+            ){
+                continue;
+            }
+
+            if(!$formatDefined){
+                //If there is a style before the Format line, the file is not valid
+                if($value[0] != "Format"){
+                    throw new \Exception("Style definition found, Format definition expected");
+                }
+
+                //So now we know for sure that we have a Format Line
+                $this->definedStyleFormatOrder(explode(",",trim($value[1])));
+                $formatDefined = true;
+            } else {
+                //There should only by Style or unkown line type now.
+                if($value[0] != "Style"){
+                    throw new \Exception("Unexpected format definition found.");
+                }
+
+                //We can Now parse the styles
+                $this->addStyleDefinition(explode(",",trim($value[1])));
+            }
+        }
+
+    }
+
+    /**
+     * @param $fields Array fields to define a style
+     * @throws \Exception
+     */
+    private function definedStyleFormatOrder($fields)
+    {
+        //We need a reference to remove unwanted spaces coming from the file
+        foreach ($fields as &$field) {
+            //Remove any unwanted spaces
+            $field = trim($field);
+            if(array_search($field,self::$stylesParamsAccepted) == false) {
+                throw new \Exception("Unknown Format Parameter");
+            }
+        }
+
+        //No Exceptions thrown, that means that each fields is correct !
+        // But there may be some fields that are twice
+        if(sizeof(array_unique($fields)) != sizeof($fields)){
+            throw new \Exception("A format parameter is defined twice.");
+        }
+
+        $this->styleFieldsOrder = $fields;
+    }
+
+    /**
+     * @param $style Array List of values for the style definition
+     * @throws \Exception
+     */
+    private function addStyleDefinition($style)
+    {
+        //We first need to confirm there is a field order defined
+        if($this->styleFieldsOrder == null){
+            throw new \Exception("Style cannot be parsed without field order defined");
+        }
+
+        //Let's confirm that there is enough params
+        if(sizeof($style) != sizeof($this->styleFieldsOrder)){
+            throw new \Exception("Bad Style definition : the number of defined fields doesn't match with format definition");
+        }
+
+        $styleDefinition = array();
+
+        //Let's now verify each value (this is boring to code)
+        // We will also save style definition as long as it is correct
+        foreach ($this->styleFieldsOrder as $k => $field) {
+            //Let's trim the value before doing anything. We don't want to fail verification because of trailling spaces
+            $style[$k] = trim($style[$k]);
+            //Let's switch \o/
+            switch($field){
+                //Numbers
+                case "Fontsize":
+                case "ScaleX":
+                case "ScaleY":
+                case "Spacing":
+                case "Angle":
+                case "MarginL":
+                case "MarginR":
+                case "MarginV":
+                case "Encoding":
+                    if(!is_numeric($style[$k])){
+                        throw new \Exception("Bad Style definition : Number expected, other found");
+                    }
+                    break;
+                //Colours
+                case "PrimaryColour":
+                case "SecondaryColour":
+                case "OutlineColor":
+                case "TertiaryColour":
+                case "BackColour":
+                    if($this->type == "ssa" && !is_numeric($style[$k])){
+                        throw new \Exception("Bad Style definition : In SSA, colours should be numbers in decimal form.");
+                    }
+                    if($this->type == "ass" && preg_match("#^&H[0-9A-F]{8}$#i",$style[$k]) == 0){
+                        throw new \Exception("Bad Style definition : Colours couldn't be identified");
+                    }
+                    break;
+                //Booleans
+                case "Bold":
+                case "Italic":
+                case "Underline":
+                case "Strikeout":
+                    if($style[$k] != -1 && $style[$k] != 0 ){
+                        throw new \Exception("Bad Style definition : Boolean should only contains -1 or 0");
+                    }
+                    break;
+                //Particular fields
+                case "BorderStyle":
+                    if($style[$k] != 1 && $style[$k] != 3){
+                        throw new \Exception("Bad Style definition : BorderStyle should only contains 1 or 3");
+                    }
+                    break;
+                case "Shadow":
+                    if($style[$k] < 0 || $style[$k] > 4){
+                        throw new \Exception("Bad Style definition : Shadow can only contains a value between 0 and 4 included");
+                    }
+                    break;
+                case "Alignment":
+                    if($style[$k] < 1 || $style[$k] > 9){
+                        throw new \Exception("Bad Style definition : Alignment can only contains a value between 1 and 9 included");
+                    }
+                    break;
+            }
+
+            //Everything is fine with this field, Let's add it to the definition
+            $styleDefinition[$field] = $style[$k];
+        }
+
+        //If we are here, this means that every field in the definition is correct
+        $this->styles[$styleDefinition["Name"]] = $styleDefinition;
+
     }
 }
