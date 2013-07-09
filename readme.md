@@ -1,7 +1,7 @@
 LibPHPAss
 =========
 
-A library to help doing stuff with qss subtitles in PHP.
+A library to help doing stuff with ass subtitles in PHP.
 
 Usage
 -----

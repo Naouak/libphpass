@@ -7,7 +7,7 @@ class AssTest extends PHPUnit_Framework_TestCase {
             $ass1 =  \LibPHPAss\AssFile::loadFromFile("validsimple.ass");
             return $ass1;
         } catch (Exception $e) {
-            $this->fail("An exception was thrown");
+            $this->fail("An exception was thrown : ".$e->getMessage());
         }
         return null;
     }
