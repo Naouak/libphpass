@@ -355,6 +355,10 @@ class AssFile {
 			$styleDefinition[$field] = $style[$k];
 		}
 
+		//Calculate the fontsize in %
+		$height = $this->head["PlayResX"];
+		$styleDefinition["FontsizePercent"] = $styleDefinition["Fontsize"]/$height;
+
 		//If we are here, this means that every field in the definition is correct
 		$this->styles[$styleDefinition["Name"]] = $styleDefinition;
 
@@ -429,7 +433,18 @@ class AssFile {
 			$event[$this->eventFieldsOrder[$i]] = $values[$i];
 		}
 
+		if($event["type"] == "dialogue" && isset($event["Style"])){
+			$event["StyleData"] = $this->styles[$event["Style"]];
+		}
+
 		//Adding the event to the event queue
 		$this->events[] = $event;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getEvents() {
+		return $this->events;
 	}
 }
