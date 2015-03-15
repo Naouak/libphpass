@@ -111,9 +111,7 @@ class AssFile {
 			throw new \Exception("Invalid File Type");
 		}
 
-		$endOfStyle = $endOfHeader;
-		$endOfStyle++;
-		$currentLine = $endOfStyle;
+		$currentLine = $endOfStyle = $endOfHeader+1;
 		//Determine end of Style block
 		while ($endOfStyle < sizeof($lines) && $lines[$endOfStyle][0] != "[") {
 			$endOfStyle++;
