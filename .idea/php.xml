@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="PhpUnit" bootstrap_file_path="C:/tools/htdocs/libphpass/tests/basic_test.php" />
+  <component name="PhpUnit">
+    <phpunit_settings>
+      <PhpUnitSettings bootstrap_file_path="$PROJECT_DIR$/../libphpass/tests/basic_test.php" />
+    </phpunit_settings>
+  </component>
 </project>
-
