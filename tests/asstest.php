@@ -33,9 +33,7 @@ class AssTest extends PHPUnit_Framework_TestCase {
 
         $this->assertInternalType("array",$header,"Not an array returned by header");
 
-        if(sizeof($expectedheader) != sizeof($header)){
-            $this->fail("Not equals amount of headers ".sizeof($header)." found, ".sizeof($expectedheader)." expected");
-        }
+        $this->assertEquals(sizeof($expectedheader),sizeof($header), "Different Header size");
 
         foreach ($expectedheader as $expectedKey => $expectedValue) {
             $this->assertTrue(isset($header[$expectedKey]));
