@@ -410,7 +410,7 @@ class AssFile {
 	 * @param $event String the event line to parse
 	 */
 	private function parseEvent($event) {
-		list($type,$values) = explode(":",$event);
+		list($type,$values) = explode(":",$event,2);
 		$paramCount = sizeof($this->eventFieldsOrder);
 
 		$type = strtolower($type);
