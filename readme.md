@@ -14,4 +14,4 @@ Usage
     //Or loading from a string
     $assFile = \LibPHPAss\AssFile::loadFromString("Ass string ...");
 
-If your Ass file is not correct, it will throw an exception with a dezscription of the problem in the message.
+If your Ass file is not correct, it will throw an exception with a description of the problem in the message.
