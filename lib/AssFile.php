@@ -93,7 +93,7 @@ class AssFile {
 
 		$currentLine = $endOfHeader = 1;
 		//End of Header detection
-		while ($endOfHeader < sizeof($lines) && $lines[$endOfHeader][0] != "[") {
+		while ($endOfHeader < sizeof($lines) && (strlen($lines[$endOfHeader]) == 0 || $lines[$endOfHeader][0] != "[") ) {
 			$endOfHeader++;
 		}
 		//We create a separate array containing only the header
@@ -113,7 +113,7 @@ class AssFile {
 
 		$currentLine = $endOfStyle = $endOfHeader+1;
 		//Determine end of Style block
-		while ($endOfStyle < sizeof($lines) && $lines[$endOfStyle][0] != "[") {
+		while ($endOfStyle < sizeof($lines) && (strlen($lines[$endOfStyle]) == 0 || $lines[$endOfStyle][0] != "[")) {
 			$endOfStyle++;
 		}
 		//Fetch only Styles

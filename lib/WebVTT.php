@@ -21,8 +21,13 @@ class WebVTT {
 		$this->events = $events;
 	}
 
+    private static function formatText($text)
+    {
+        return str_replace("\\N","\n", $text);
+    }
 
-	private static function formatPercent($percent) {
+
+    private static function formatPercent($percent) {
 		return round($percent*100,2)."%";
 	}
 
@@ -99,7 +104,7 @@ class WebVTT {
 
 			//Payload (the text of the subtitle)
 			//@todo Text formatting
-			$cue.=$event["Text"];
+			$cue.=self::formatText($event["Text"]);
 			$cue.="\n";
 		}
 
