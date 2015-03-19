@@ -21,9 +21,36 @@ class WebVTT {
 		$this->events = $events;
 	}
 
+    private static function formatLine($line)
+    {
+        $line = preg_replace_callback("/\\{\\\\([^\\}]*)\\}/", function($matches){
+            $tags = array(
+                "i1" => "i",
+                "i0" => "/i",
+                "i" => "/i"
+            );
+
+            if(!isset($tags[$matches[1]])){
+                return "";
+            }
+
+            return "<".$tags[$matches[1]].">";
+        }, $line);
+        return $line;
+    }
+
     private static function formatText($text)
     {
-        return str_replace("\\N","\n", $text);
+        $text = str_replace("\\N","\n", $text);
+
+        $lines = explode("\n", $text);
+
+        foreach ($lines as $key => $line) {
+            $lines[$key] = self::formatLine($line);
+        }
+
+        $text = implode("\n", $lines);
+        return $text;
     }
 
 
