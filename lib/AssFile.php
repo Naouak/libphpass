@@ -22,33 +22,33 @@ class AssFile {
 		"WrapStyle"
 	);
 	static private $stylesParamsAccepted = array(
-		"Name",
-		"Fontname",
-		"Fontsize",
-		"PrimaryColour",
-		"SecondaryColour",
-		"TertiaryColour",
-		"OutlineColor",
-		"BackColour",
-		"Bold",
-		"Italic",
-		"Underline",
-		"StrikeOut",
-		"ScaleX",
-		"ScaleY",
-		"Spacing",
-		"Angle",
-		"BorderStyle",
-		"Outline",
-		"Shadow",
-		"Alignment",
-		"MarginL",
-		"MarginR",
-		"MarginV",
-		"AlphaLevel",
-		"Encoding",
+		"name",
+		"fontname",
+		"fontsize",
+		"primarycolour",
+		"secondarycolour",
+		"tertiarycolour",
+		"outlinecolor",
+		"backcolour",
+		"bold",
+		"italic",
+		"underline",
+		"strikeout",
+		"scalex",
+		"scaley",
+		"spacing",
+		"angle",
+		"borderstyle",
+		"outline",
+		"shadow",
+		"alignment",
+		"marginl",
+		"marginr",
+		"marginv",
+		"alphalevel",
+		"encoding",
 		//Various acceptable but not in spec field name
-		"OutlineColour"
+		"outlinecolour"
 	);
 	static private $eventParamsAccepted = array(
 		"Marked",
@@ -258,7 +258,7 @@ class AssFile {
 		//We need a reference to remove unwanted spaces coming from the file
 		foreach ($fields as &$field) {
 			//Remove any unwanted spaces
-			$field = trim($field);
+			$field = strtolower(trim($field));
 			if (array_search($field, self::$stylesParamsAccepted) === false) {
 				throw new \Exception("Unknown Format Parameter : ".$field);
 			}
@@ -298,25 +298,25 @@ class AssFile {
 			//Let's switch \o/
 			switch ($field) {
 				//Numbers
-				case "Fontsize":
-				case "ScaleX":
-				case "ScaleY":
-				case "Spacing":
-				case "Angle":
-				case "MarginL":
-				case "MarginR":
-				case "MarginV":
-				case "Encoding":
+				case "fontsize":
+				case "scalex":
+				case "scaley":
+				case "spacing":
+				case "angle":
+				case "marginl":
+				case "marginr":
+				case "marginv":
+				case "encoding":
 					if (!is_numeric($style[$k])) {
 						throw new \Exception("Bad Style definition : Number expected, other found");
 					}
 					break;
 				//Colours
-				case "PrimaryColour":
-				case "SecondaryColour":
-				case "OutlineColor":
-				case "TertiaryColour":
-				case "BackColour":
+				case "primarycolour":
+				case "secondarycolour":
+				case "outlinecolor":
+				case "tertiarycolour":
+				case "backcolour":
 					if ($this->type == "ssa" && !is_numeric($style[$k])) {
 						throw new \Exception("Bad Style definition : In SSA, colours should be numbers in decimal form.");
 					}
@@ -325,26 +325,26 @@ class AssFile {
 					}
 					break;
 				//Booleans
-				case "Bold":
-				case "Italic":
-				case "Underline":
-				case "Strikeout":
+				case "bold":
+				case "italic":
+				case "underline":
+				case "strikeout":
 					if ($style[$k] != -1 && $style[$k] != 0) {
 						throw new \Exception("Bad Style definition : Boolean should only contains -1 or 0");
 					}
 					break;
 				//Particular fields
-				case "BorderStyle":
+				case "borderstyle":
 					if ($style[$k] != 1 && $style[$k] != 3) {
 						throw new \Exception("Bad Style definition : BorderStyle should only contains 1 or 3");
 					}
 					break;
-				case "Shadow":
+				case "shadow":
 					if ($style[$k] < 0 || $style[$k] > 4) {
 						throw new \Exception("Bad Style definition : Shadow can only contains a value between 0 and 4 included");
 					}
 					break;
-				case "Alignment":
+				case "alignment":
 					if ($style[$k] < 1 || $style[$k] > 9) {
 						throw new \Exception("Bad Style definition : Alignment can only contains a value between 1 and 9 included");
 					}
@@ -357,10 +357,10 @@ class AssFile {
 
 		//Calculate the fontsize in %
 		$height = $this->head["PlayResX"];
-		$styleDefinition["FontsizePercent"] = $styleDefinition["Fontsize"]/$height;
+		$styleDefinition["fontsizepercent"] = $styleDefinition["fontsize"]/$height;
 
 		//If we are here, this means that every field in the definition is correct
-		$this->styles[$styleDefinition["Name"]] = $styleDefinition;
+		$this->styles[$styleDefinition["name"]] = $styleDefinition;
 
 	}
 

@@ -92,7 +92,7 @@ class WebVTT {
 			//Cue settings
 			$cue_settings = array();
 
-			$alignement = $event["StyleData"]["Alignment"];
+			$alignement = $event["StyleData"]["alignment"];
 			//Horizontal position
 			$cue_setting="line:";
 			if($alignement%3==0){
@@ -116,7 +116,7 @@ class WebVTT {
 			$cue_settings[] = $cue_setting;
 
 			//FontSize
-			$cue_setting="size:".self::formatPercent($event["StyleData"]["FontsizePercent"]);
+			$cue_setting="size:".self::formatPercent($event["StyleData"]["fontsizepercent"]);
 			$cue_settings[] = $cue_setting;
 
 			//Alignment of the text
